@@ -1,0 +1,48 @@
+package:
+  name: src
+  version: 5.1.2
+  epoch: 0
+  description: "The Sourcegraph CLI"
+  copyright:
+    - license: Apache-2.0
+  dependencies:
+    runtime:
+      - ca-certificates-bundle
+      - git
+
+environment:
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/bootstrap/stage3
+      - https://packages.wolfi.dev/os
+      - '@local /work/packages'
+    keyring:
+      - https://packages.wolfi.dev/bootstrap/stage3/wolfi-signing.rsa.pub
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages:
+      - busybox
+      - ca-certificates-bundle
+      - build-base
+      - go
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://github.com/sourcegraph/src-cli
+      expected-commit: 511ebf8962ac8ff069cfde63719d4339ff347298
+      tag: ${{package.version}}
+  
+  - uses: go/build
+    with:
+      packages: ./cmd/src
+      ldflags: -X github.com/sourcegraph/src-cli/internal/version.BuildTag=${{package.version}}
+      output: src
+
+  - uses: strip
+
+update:
+  enabled: true
+  github:
+    identifier: sourcegraph/src-cli
+    strip-prefix: v
+
