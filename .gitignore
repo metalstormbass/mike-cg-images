@@ -1,0 +1,7 @@
+*.zip
+*.rsa
+*.rsa.pub
+packages/
+*.cdx
+*.spdx.json
+
