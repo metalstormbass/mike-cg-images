@@ -1,0 +1,47 @@
+package:
+  name: eksctl
+  version: 0.156.0
+  epoch: 0
+  description: "A simple CLI tool for creating clusters on EKS - Amazon's new managed Kubernetes service for EC2. It is written in Go, and uses CloudFormation."
+  copyright:
+    - license: Apache-2.0
+  dependencies:
+    runtime:
+      - ca-certificates-bundle
+
+
+environment:
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/bootstrap/stage3
+      - https://packages.wolfi.dev/os
+      - '@local /work/packages'
+    keyring:
+      - https://packages.wolfi.dev/bootstrap/stage3/wolfi-signing.rsa.pub
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages:
+      - busybox
+      - ca-certificates-bundle
+      - go
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://github.com/eksctl-io/eksctl
+      expected-commit: 48d2954c5089702bbaa2b926454a305d6eeab240
+      tag: v${{package.version}}
+  
+  - runs: |
+      make binary
+      mkdir -p ${{targets.destdir}}/usr/bin
+      mv eksctl ${{targets.destdir}}/usr/bin/
+
+
+  - uses: strip
+
+update:
+  enabled: true
+  github:
+    identifier: eksctl-io/eksctl
+    strip-prefix: v
+
