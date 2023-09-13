@@ -1,0 +1,58 @@
+package:
+  name: broker-github-com
+  version: 4.163.0
+  epoch: 0
+  description: "Snyk Broker proxies access between snyk.io and your Git repositories, such as GitHub Enterprise, GitHub.com and Bitbucket Server. Snyk Broker can also be used to enable a secure connection with your on-premise Jira deployment."
+  copyright:
+    - license: Apache-2.0
+  dependencies:
+    runtime:
+      - ca-certificates-bundle
+      - nodejs
+
+
+environment:
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/bootstrap/stage3
+      - https://packages.wolfi.dev/os
+      - '@local /work/packages'
+    keyring:
+      - https://packages.wolfi.dev/bootstrap/stage3/wolfi-signing.rsa.pub
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages:
+      - busybox
+      - wolfi-baselayout
+      - ca-certificates-bundle
+      - npm
+      - nodejs
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://github.com/snyk/broker
+      expected-commit: 3e2b9a02cb9ae1132f9226050020ec861244b35c
+      tag: v${{package.version}}
+  
+  - runs: |
+      set -x
+      EXECDIR="${{targets.destdir}}/usr/bin"
+      mkdir -p "${EXECDIR}/broker"
+      cp .editorconfig .eslintrc.json .npmignore .npmrc .nvmrc .prettierrc.json .releaserc config.default.json jest.config.ts lintVerifier.sh tsconfig.json package.json ${EXECDIR}/broker
+      cp -r bin lib test cli client-templates ${EXECDIR}/broker
+
+      chmod +x "${EXECDIR}/broker"
+      (cd "${EXECDIR}/broker" && npm install --loglevel=info)
+      
+      rm -rf ${EXECDIR}/broker/node_modules/setheader/node_modules/debug
+      #rm -rf ${EXECDIR}/broker/node_modules/tough-cookie
+      #npm i tough-cookie@4.1.3
+      rm -rf ${EXECDIR}/broker/node_modules/resolve/test
+      mv ${EXECDIR}/broker/dist/client-templates/github-com/accept.json.sample ${EXECDIR}/broker/dist/client-templates/github-com/accept.json
+      
+update:
+  enabled: true
+  github:
+    identifier: snyk/broker
+    strip-prefix: v
+

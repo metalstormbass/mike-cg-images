@@ -1,0 +1,26 @@
+contents:
+  keyring:
+    - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    - /work/melange.rsa.pub
+  repositories:
+    - https://packages.wolfi.dev/os
+    - '@local /work/packages'
+  packages:
+    - ca-certificates
+    - wolfi-baselayout
+    - wolfi-base
+    - busybox
+    - nodejs
+    - broker-github-com@local
+
+
+environment:
+  ACCEPT: /usr/bin/broker/dist/client-templates/github-com/accept.json
+
+
+entrypoint:
+  command: node /usr/bin/broker/dist/cli/index.js
+
+
+
+
