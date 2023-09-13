@@ -1,0 +1,40 @@
+package:
+  name: cowsay
+  version: 3.7.0
+  epoch: 0
+  description: "Cowsay is a configurable talking cow, written in Perl. It operates much as the figlet program does, and is written in the same spirit of silliness."
+  copyright:
+    - license: GPL-3.0
+  dependencies:
+    runtime:
+      - ca-certificates-bundle
+      - perl
+
+
+environment:
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/bootstrap/stage3
+      - https://packages.wolfi.dev/os
+      - '@local /work/packages'
+    keyring:
+      - https://packages.wolfi.dev/bootstrap/stage3/wolfi-signing.rsa.pub
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages:
+      - busybox
+      - ca-certificates-bundle
+      - build-base
+      - bash
+      - perl
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://github.com/cowsay-org/cowsay
+      expected-commit: f7f1ecaf54a13f3f53d49a76161150738e0f3ed0
+      tag: v${{package.version}}
+
+  - uses: autoconf/make-install
+
+update:
+  enabled: false
