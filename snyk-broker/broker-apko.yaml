@@ -11,12 +11,10 @@ contents:
     - wolfi-base
     - busybox
     - nodejs
-    - broker-github-com@local
-
+    - broker@local
 
 environment:
-  ACCEPT: /usr/bin/broker/dist/client-templates/github-com/accept.json
-
+  BROKER_SERVER_URL: "https://broker.snyk.io"
 
 entrypoint:
   command: node /usr/bin/broker/dist/cli/index.js

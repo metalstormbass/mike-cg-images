@@ -1,5 +1,5 @@
 package:
-  name: broker-github-com
+  name: broker
   version: 4.163.0
   epoch: 0
   description: "Snyk Broker proxies access between snyk.io and your Git repositories, such as GitHub Enterprise, GitHub.com and Bitbucket Server. Snyk Broker can also be used to enable a secure connection with your on-premise Jira deployment."
@@ -27,6 +27,10 @@ environment:
       - npm
       - nodejs
 
+vars:
+  scmType: "github-com"
+
+
 pipeline:
   - uses: git-checkout
     with:
@@ -36,20 +40,24 @@ pipeline:
   
   - runs: |
       set -x
-      EXECDIR="${{targets.destdir}}/usr/bin"
-      mkdir -p "${EXECDIR}/broker"
+      OUTDIR="${{targets.destdir}}/usr/bin"
+      EXECDIR="workdir"
+      mkdir -p "${EXECDIR}/broker" "${OUTDIR}/broker" 
+      
       cp .editorconfig .eslintrc.json .npmignore .npmrc .nvmrc .prettierrc.json .releaserc config.default.json jest.config.ts lintVerifier.sh tsconfig.json package.json ${EXECDIR}/broker
       cp -r bin lib test cli client-templates ${EXECDIR}/broker
 
       chmod +x "${EXECDIR}/broker"
-      (cd "${EXECDIR}/broker" && npm install --loglevel=info)
-      
+      (cd "${EXECDIR}/broker" && npm install --loglevel=info)  
+
       rm -rf ${EXECDIR}/broker/node_modules/setheader/node_modules/debug
-      #rm -rf ${EXECDIR}/broker/node_modules/tough-cookie
-      #npm i tough-cookie@4.1.3
       rm -rf ${EXECDIR}/broker/node_modules/resolve/test
-      mv ${EXECDIR}/broker/dist/client-templates/github-com/accept.json.sample ${EXECDIR}/broker/dist/client-templates/github-com/accept.json
-      
+
+      mv ${EXECDIR}/broker/dist/ ${OUTDIR}/broker
+      mv ${EXECDIR}/broker/node_modules ${OUTDIR}/broker
+      node ${OUTDIR}/broker/dist/cli/index.js init ${{vars.scmType}} 
+
+     
 update:
   enabled: true
   github:
