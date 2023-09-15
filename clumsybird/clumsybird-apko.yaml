@@ -5,15 +5,14 @@ contents:
   repositories:
     - https://packages.wolfi.dev/os
     - '@local /work/packages'
+
   packages:
     - ca-certificates
+    - wolfi-baselayout
+    - wolfi-base
     - busybox
-    - perl
-    - cowsay@local
-
+    - nodejs
+    - clumsybird@local
+work-dir: /usr/bin/clumsybird
 entrypoint:
-  command: cowsay
-
-
-
-
+  command: /usr/bin/grunt/bin/grunt connect 

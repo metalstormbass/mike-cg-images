@@ -23,8 +23,6 @@ environment:
     packages:
       - busybox
       - ca-certificates-bundle
-      - build-base
-      - bash
       - perl
 
 pipeline:

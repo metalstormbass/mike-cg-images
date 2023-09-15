@@ -1,0 +1,46 @@
+package:
+  name: grunt
+  version: 1.6.1
+  epoch: 0
+  description: "Grunt: The JavaScript Task Runner"
+  copyright:
+    - license: jQuery
+  dependencies:
+    runtime:
+      - ca-certificates-bundle
+      - nodejs
+
+environment:
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/bootstrap/stage3
+      - https://packages.wolfi.dev/os
+      - '@local /work/packages'
+    keyring:
+      - https://packages.wolfi.dev/bootstrap/stage3/wolfi-signing.rsa.pub
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages:
+      - busybox
+      - wolfi-baselayout
+      - ca-certificates-bundle
+      - npm
+      - nodejs
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://github.com/gruntjs/grunt
+      expected-commit: 8372e118eb8c4c6d40e9c6c5684948a786dee8a9
+      tag: v${{package.version}}
+
+  - runs: |
+      EXECDIR="${{targets.destdir}}/usr/bin"
+      mkdir -p "${EXECDIR}/grunt"
+      npm install
+
+      cp -r bin docs internal-tasks lib test node_modules ${EXECDIR}/grunt
+      cp .eslintrc Gruntfile.js package.json package-lock.json ${EXECDIR}/grunt
+
+update:
+  enabled: false
+

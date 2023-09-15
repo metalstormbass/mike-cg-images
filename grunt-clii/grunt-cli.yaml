@@ -1,0 +1,46 @@
+package:
+  name: grunt-cli
+  version: 1.4.3
+  epoch: 0
+  description: "Grunt's command line interface."
+  copyright:
+    - license: MIT
+  dependencies:
+    runtime:
+      - ca-certificates-bundle
+      - nodejs
+
+environment:
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/bootstrap/stage3
+      - https://packages.wolfi.dev/os
+      - '@local /work/packages'
+    keyring:
+      - https://packages.wolfi.dev/bootstrap/stage3/wolfi-signing.rsa.pub
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages:
+      - busybox
+      - wolfi-baselayout
+      - ca-certificates-bundle
+      - npm
+      - nodejs
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://github.com/gruntjs/grunt-cli
+      expected-commit: cf8c452550fb292927c02de266e38bd122290aa3
+      tag: v${{package.version}}
+
+  - runs: |
+      EXECDIR="${{targets.destdir}}/usr/bin"
+      mkdir -p "${EXECDIR}/gruntcli"
+      npm install
+      cp  .jshintrc Gruntfile.js package.json package-lock.json ${EXECDIR}/gruntcli
+      cp -r node_modules completion bin lib ${EXECDIR}/gruntcli
+      chmod +x ${EXECDIR}/gruntcli/bin/grunt
+
+update:
+  enabled: false
+

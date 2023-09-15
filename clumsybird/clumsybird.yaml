@@ -1,0 +1,57 @@
+package:
+  name: clumsybird
+  version: 1.0
+  epoch: 0
+  description: "A MelonJS made Flappy Bird clone."
+  copyright:
+    - license: GPL-3.0
+  dependencies:
+    runtime:
+      - ca-certificates-bundle
+      - nodejs
+
+environment:
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/bootstrap/stage3
+      - https://packages.wolfi.dev/os
+      - '@local /work/packages'
+    keyring:
+      - https://packages.wolfi.dev/bootstrap/stage3/wolfi-signing.rsa.pub
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages:
+      - busybox
+      - wolfi-baselayout
+      - ca-certificates-bundle
+      - npm
+      - nodejs
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://github.com/ellisonleao/clumsy-bird
+
+  - runs: |
+      EXECDIR="${{targets.destdir}}/usr/bin"
+      mkdir -p "${EXECDIR}/clumsybird"
+      npm install
+      
+      cp Gruntfile.js Procfile app.json humans.txt index.css index.html package.json package-lock.json ${EXECDIR}/clumsybird
+      cp -r build data js node_modules ${EXECDIR}/clumsybird
+      
+  - uses: git-checkout
+    with:
+      repository: https://github.com/gruntjs/grunt
+      
+
+  - runs: |
+      EXECDIR="${{targets.destdir}}/usr/bin"
+      mkdir -p "${EXECDIR}/grunt"
+      npm install
+
+      cp -r bin docs internal-tasks lib test node_modules ${EXECDIR}/grunt
+      cp .eslintrc Gruntfile.js package.json package-lock.json ${EXECDIR}/grunt
+
+update:
+  enabled: false
+
